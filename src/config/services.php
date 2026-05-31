@@ -35,4 +35,8 @@ return [
         ],
     ],
 
+    'refik_api' => [
+        'base_url' => env('REFIK_API_URL', 'https://api.refik.demirtassistem.com'),
+    ],
+
 ];

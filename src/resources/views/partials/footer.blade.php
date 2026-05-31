@@ -7,10 +7,6 @@
             <div class="flex items-center gap-3">
                 <img src="{{ asset(config('site.logo')) }}" alt="{{ config('site.name') }}"
                      class="h-12 w-auto object-contain">
-                <div>
-                    <div class="text-2xl font-extrabold font-display text-white">REFİK</div>
-                    <div class="text-[0.7rem] tracking-[0.25em] uppercase text-brand-300">Derneği</div>
-                </div>
             </div>
             <p class="mt-5 text-sm leading-relaxed text-brand-200">
                 Hayra Yoldaş ol — destekçilerimizin bağışlarıyla mağdur ve mazlumlara umut oluyor,

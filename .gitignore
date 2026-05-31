@@ -37,3 +37,10 @@ src/storage/*.key
 
 # Claude / yerel ajan
 .claude/
+
+# Server-side runtime data
+.env
+mysql_data/
+redis_data/
+refiklogo2.png
+src/public_volume/build/

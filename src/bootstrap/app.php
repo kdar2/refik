@@ -15,6 +15,9 @@ return Application::configure(basePath: dirname(__DIR__))
         },
     )
     ->withMiddleware(function (Middleware $middleware): void {
+        // nginx-proxy arkasında çalışırken HTTPS header'larına güven
+        $middleware->trustProxies(at: '*');
+
         // Ödeme sağlayıcı webhookları CSRF'den muaf
         $middleware->validateCsrfTokens(except: [
             'webhooks/*',

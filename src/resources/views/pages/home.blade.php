@@ -197,7 +197,7 @@
                         @if ($c->category)
                             <p class="mt-2 text-[11px] uppercase tracking-wider font-semibold text-brand-500">
                                 {{ $c->category->name_tr }}
-                                @if ($c->country)<span class="text-slate-400"> · {{ $c->country->name_tr }}</span>@endif
+                                @if ($c->country)<span class="text-slate-400"> · {{ $c->country }}</span>@endif
                             </p>
                         @endif
                         <a href="#bagis" class="btn-accent btn-md w-full mt-5 justify-center">

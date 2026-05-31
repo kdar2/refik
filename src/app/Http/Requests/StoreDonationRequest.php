@@ -16,7 +16,8 @@ class StoreDonationRequest extends FormRequest
     {
         return [
             // Adım 1 — tutar & tür
-            'campaign_id'   => ['nullable', 'exists:campaigns,id'],
+            'campaign_id'   => ['nullable', 'integer'],
+            'campaign_slug' => ['nullable', 'string', 'max:191'],
             'amount'        => ['required', 'numeric', 'min:1', 'max:1000000'],
             'currency'      => ['required', Rule::in(['TRY', 'USD', 'EUR'])],
             'type'          => ['required', Rule::in(['general', 'zakat', 'fitre', 'sadaka', 'kurban', 'adak', 'kefaret'])],

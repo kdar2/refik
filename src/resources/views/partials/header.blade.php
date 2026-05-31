@@ -9,10 +9,6 @@
         <a href="{{ route('home') }}" class="flex items-center gap-2 shrink-0 group" aria-label="{{ config('site.legal_name') }}">
             <img src="{{ asset(config('site.logo')) }}" alt="{{ config('site.name') }}"
                  class="h-10 w-auto object-contain group-hover:scale-105 transition">
-            <span class="flex flex-col leading-tight">
-                <span class="text-xl font-extrabold font-display text-brand-900 tracking-tight">REFİK</span>
-                <span class="text-[0.65rem] tracking-[0.25em] uppercase text-brand-500 font-semibold">Derneği</span>
-            </span>
         </a>
 
         {{-- Desktop nav --}}

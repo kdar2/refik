@@ -3,52 +3,70 @@
 namespace App\Http\Controllers\Site;
 
 use App\Http\Controllers\Controller;
-use App\Models\Post;
-use App\Models\PostCategory;
+use App\Services\ApiService;
 use Illuminate\Http\Request;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\View\View;
 
 class PostController extends Controller
 {
+    public function __construct(private readonly ApiService $api)
+    {
+    }
+
     public function index(Request $request): View
     {
-        $q = Post::published()->with('category')->latest('published_at');
+        $params = array_filter([
+            'category' => $request->query('category') ?: null,
+            'q'        => $request->query('q')        ?: null,
+            'page'     => $request->query('page', 1),
+        ], fn ($v) => $v !== null && $v !== '');
 
-        if ($slug = $request->query('category')) {
-            $q->whereHas('category', fn ($qq) => $qq->where('slug', $slug));
-        }
+        $raw   = $this->api->get('/api/v1/posts/', $params);
+        $items = data_get($raw, 'results', $raw ?: []);
+        $total = data_get($raw, 'count', count($items));
 
-        if ($search = $request->query('q')) {
-            $q->where(function ($qq) use ($search) {
-                $qq->where('title_tr', 'like', "%{$search}%")
-                   ->orWhere('excerpt_tr', 'like', "%{$search}%");
-            });
-        }
+        $perPage = 9;
+        $page    = (int) $request->query('page', 1);
 
-        return view('pages.posts.index', [
-            'posts'          => $q->paginate(9)->withQueryString(),
-            'categories'     => PostCategory::active()->get(),
+        $posts = new LengthAwarePaginator(
+            collect($items),
+            $total,
+            $perPage,
+            $page,
+            ['path' => $request->url(), 'query' => $request->query()],
+        );
+
+        // Kategori listesi — API'de ayrı endpoint yoksa boş bırak
+        $categoriesRaw = $this->api->get('/api/v1/posts/categories/', [], 3600);
+        $categories    = collect(data_get($categoriesRaw, 'results', $categoriesRaw ?: []));
+
+        $slug   = $request->query('category');
+        $search = $request->query('q');
+
+        return view('pages.posts.index', compact('posts', 'categories', 'slug', 'search') + [
             'activeCategory' => $slug,
-            'search'         => $search,
         ]);
     }
 
     public function show(string $slug): View
     {
-        $post = Post::published()
-            ->with(['category', 'author'])
-            ->where('slug', $slug)
-            ->firstOrFail();
+        $post = $this->api->get("/api/v1/posts/{$slug}/");
 
-        // Görüntülenme sayacı (gevşek — concurrency önemsiz)
-        $post->increment('view_count');
+        if (empty($post)) {
+            abort(404);
+        }
 
-        $related = Post::published()
-            ->where('id', '<>', $post->id)
-            ->where('post_category_id', $post->post_category_id)
-            ->latest('published_at')
-            ->limit(3)
-            ->get();
+        // İlgili haberler: aynı kategori
+        $categorySlug = data_get($post, 'category.slug') ?? data_get($post, 'category_slug');
+        $relatedRaw   = $this->api->get('/api/v1/posts/', array_filter([
+            'category' => $categorySlug,
+            'limit'    => 4,
+        ]), 300);
+
+        $related = collect(data_get($relatedRaw, 'results', $relatedRaw ?: []))
+            ->reject(fn ($item) => data_get($item, 'slug') === $slug)
+            ->take(3);
 
         return view('pages.posts.show', compact('post', 'related'));
     }

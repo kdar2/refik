@@ -3,85 +3,81 @@
 namespace App\Http\Controllers\Site;
 
 use App\Http\Controllers\Controller;
-use App\Models\Campaign;
-use App\Models\CampaignCategory;
-use App\Models\Country;
+use App\Services\ApiService;
 use Illuminate\Http\Request;
+use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Collection;
 use Illuminate\View\View;
 
 class CampaignController extends Controller
 {
+    public function __construct(private readonly ApiService $api)
+    {
+    }
+
     public function index(Request $request): View
     {
-        $q = Campaign::active()
-            ->with(['category', 'country'])
-            ->orderBy('order')
-            ->latest();
+        $params = array_filter([
+            'category_id' => $request->query('category_id') ?: ($request->query('category') ?: null),
+            'search'      => $request->query('search') ?: ($request->query('q') ?: null),
+            'ordering'    => $this->mapOrdering($request->query('sort', 'featured')),
+            'page'        => $request->query('page', 1),
+            'region'      => $request->query('region') ?: null,
+            'eligibility' => $request->query('eligibility') ?: null,
+        ], fn ($v) => $v !== null && $v !== '');
 
-        // Kategori filtresi (slug üzerinden)
-        if ($slug = $request->query('category')) {
-            $q->whereHas('category', fn ($qq) => $qq->where('slug', $slug));
-        }
+        $raw     = $this->api->get('/api/v1/donations/projects/', $params);
+        $items   = collect(data_get($raw, 'results', []))->map(fn($i) => $this->api->toObject($i));
+        $total   = data_get($raw, 'count', $items->count());
+        $perPage = 12;
+        $page    = (int) $request->query('page', 1);
 
-        // Bölge: yurtici / yurtdisi (TUR ise yurtici, diğerleri yurtdisi)
-        if ($region = $request->query('region')) {
-            $q->whereHas('country', function ($qq) use ($region) {
-                $region === 'yurtici'
-                    ? $qq->where('code', 'TUR')
-                    : $qq->where('code', '<>', 'TUR');
-            });
-        }
+        $campaigns = new LengthAwarePaginator(
+            $items, $total, $perPage, $page,
+            ['path' => $request->url(), 'query' => $request->query()],
+        );
 
-        // Bağış uygunluğu: zakat | sadaka | fitre | kurban
+        $categories = $this->api->collect('/api/v1/donations/categories/', [], 600);
+
+        $slug        = $request->query('category');
+        $region      = $request->query('region');
         $eligibility = $request->query('eligibility');
-        if (in_array($eligibility, ['zakat', 'sadaka', 'fitre', 'kurban'], true)) {
-            $q->where("{$eligibility}_eligible", true);
-        }
-
-        // Sıralama: newest | most-donated | ending-soon
-        switch ($request->query('sort', 'featured')) {
-            case 'most-donated':
-                $q->reorder('raised_amount', 'desc');
-                break;
-            case 'ending-soon':
-                $q->reorder('end_date', 'asc');
-                break;
-            case 'newest':
-                $q->reorder('created_at', 'desc');
-                break;
-            case 'featured':
-            default:
-                $q->reorder('is_featured', 'desc')->orderBy('order');
-                break;
-        }
-
-        $campaigns = $q->paginate(12)->withQueryString();
-
-        $categories = CampaignCategory::active()->orderBy('order')->get();
 
         return view('pages.campaigns.index', [
-            'campaigns'      => $campaigns,
-            'categories'     => $categories,
-            'activeCategory' => $slug,
-            'activeRegion'   => $region,
+            'campaigns'         => $campaigns,
+            'categories'        => $categories,
+            'activeCategory'    => $slug,
+            'activeRegion'      => $region,
             'activeEligibility' => $eligibility,
-            'sort'           => $request->query('sort', 'featured'),
+            'sort'              => $request->query('sort', 'featured'),
         ]);
     }
 
     public function show(string $slug): View
     {
-        $campaign = Campaign::active()
-            ->with(['category', 'country'])
-            ->where('slug', $slug)
-            ->firstOrFail();
+        $campaignData = $this->api->get("/api/v1/donations/projects/{$slug}/");
+        $campaign     = $campaignData ? (object) $campaignData : null;
 
-        $similar = Campaign::active()
-            ->where('id', '<>', $campaign->id)
-            ->where('category_id', $campaign->category_id)
-            ->limit(3)
-            ->get();
+        abort_if(! $campaign, 404);
+
+        $categoryId = $campaign->category['id'] ?? null;
+        $similar    = collect();
+        if ($categoryId) {
+            $similar = $this->api->collect('/api/v1/donations/projects/', [
+                'category_id' => $categoryId, 'limit' => 4,
+            ])->reject(fn($item) => $item->slug === $slug)->take(3);
+        }
 
         return view('pages.campaigns.show', compact('campaign', 'similar'));
+    }
+
+    private function mapOrdering(string $sort): string
+    {
+        return match ($sort) {
+            'most-donated' => '-raised_amount',
+            'ending-soon'  => 'end_date',
+            'newest'       => '-created_at',
+            default        => '-is_featured',
+        };
     }
 }

@@ -20,7 +20,7 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 WORKDIR /build
 COPY src/ /build/
 
-RUN composer install --no-dev --optimize-autoloader --no-interaction --no-progress \
+RUN composer update --no-dev --optimize-autoloader --no-interaction --no-progress \
     && npm ci --no-audit --no-fund --loglevel=error \
     && npm run build \
     && rm -rf node_modules

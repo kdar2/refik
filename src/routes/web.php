@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Site\AppointmentController;
+use App\Http\Controllers\Site\AuthController;
 use App\Http\Controllers\Site\CampaignController;
 use App\Http\Controllers\Site\CartController;
 use App\Http\Controllers\Site\ContactController;
@@ -77,3 +78,19 @@ Route::get('/robots.txt',  [SitemapController::class, 'robots'])->name('robots')
 // Ödeme webhookları
 Route::post('/webhooks/iyzico', [WebhookController::class, 'iyzico'])->name('webhooks.iyzico');
 Route::post('/webhooks/paytr',  [WebhookController::class, 'paytr'])->name('webhooks.paytr');
+
+/*
+|--------------------------------------------------------------------------
+| Auth Routes (API destekli)
+|--------------------------------------------------------------------------
+*/
+Route::get('/giris',    [AuthController::class, 'loginForm'])->name('login');
+Route::post('/giris',   [AuthController::class, 'login'])->middleware('throttle:10,1')->name('auth.login');
+
+Route::get('/kayit',    [AuthController::class, 'registerForm'])->name('register');
+Route::post('/kayit',   [AuthController::class, 'register'])->middleware('throttle:5,1')->name('auth.register');
+
+Route::post('/cikis',   [AuthController::class, 'logout'])->name('auth.logout');
+
+// Guest token endpoint (AJAX)
+Route::post('/api/guest-token', [AuthController::class, 'guestToken'])->name('auth.guest-token');
