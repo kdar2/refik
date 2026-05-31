@@ -40,6 +40,5 @@ src/storage/*.key
 # Server-side runtime data
 .env
 mysql_data/
-redis_data/
 refiklogo2.png
 src/public_volume/build/
