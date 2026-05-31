@@ -104,7 +104,7 @@
                         <a href="{{ route('campaigns.show', $c->slug) }}" class="block">
                             <div class="card-media">
                                 <div class="absolute inset-0 bg-gradient-to-br from-brand-700/40 via-brand-700/10 to-transparent z-[1]"></div>
-                                <img src="{{ $c->cover_image }}" alt="{{ $c->title_tr }}" loading="lazy"
+                                <img src="{{ $c->cover_image ?: asset(config('site.default_image')) }}" alt="{{ $c->title_tr }}" loading="lazy"
                                      class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
                                 <div class="absolute top-3 right-3 z-[2] flex gap-1.5">
                                     @if ($c->zakat_eligible)  <span class="badge-z">Z</span> @endif

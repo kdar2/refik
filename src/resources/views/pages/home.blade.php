@@ -172,7 +172,7 @@
                 <article class="card group" data-rise>
                     <div class="card-media">
                         <div class="absolute inset-0 bg-gradient-to-br from-brand-700/40 via-brand-700/10 to-transparent z-[1]"></div>
-                        <img src="{{ $c->cover_image }}" alt="{{ $c->title_tr }}" loading="lazy"
+                        <img src="{{ $c->cover_image ?: asset(config('site.default_image')) }}" alt="{{ $c->title_tr }}" loading="lazy"
                              class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
                         <div class="absolute top-3 right-3 z-[2] flex gap-1.5">
                             @if ($c->zakat_eligible)  <span class="badge-z" title="Zekat için uygundur">Z</span> @endif
@@ -698,7 +698,7 @@
         @if ($featuredPost)
             <div class="grid lg:grid-cols-3 gap-6">
                 <article class="lg:col-span-2 relative rounded-3xl overflow-hidden min-h-[480px] group">
-                    <img src="{{ $featuredPost->cover_image }}" alt="{{ $featuredPost->title_tr }}"
+                    <img src="{{ $featuredPost->cover_image ?: asset(config('site.default_image')) }}" alt="{{ $featuredPost->title_tr }}"
                          class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition duration-700">
                     <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent"></div>
                     <div class="relative h-full flex flex-col justify-end p-8 lg:p-10 text-white">
@@ -722,7 +722,7 @@
                 <div class="space-y-6">
                     @foreach ($sidePosts as $p)
                         <article class="relative rounded-2xl overflow-hidden h-44 group cursor-pointer">
-                            <img src="{{ $p->cover_image }}" alt="{{ $p->title_tr }}"
+                            <img src="{{ $p->cover_image ?: asset(config('site.default_image')) }}" alt="{{ $p->title_tr }}"
                                  class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition duration-500">
                             <div class="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent"></div>
                             <div class="relative h-full flex flex-col justify-end p-4 text-white">
@@ -738,7 +738,7 @@
                 <div class="mt-6 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
                     @foreach ($thumbPosts as $p)
                         <a href="#" class="relative aspect-[4/3] rounded-xl overflow-hidden group block">
-                            <img src="{{ $p->cover_image }}" alt="{{ $p->title_tr }}"
+                            <img src="{{ $p->cover_image ?: asset(config('site.default_image')) }}" alt="{{ $p->title_tr }}"
                                  class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition">
                             <div class="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent"></div>
                             <span class="absolute inset-x-2 bottom-2 text-white text-[11px] font-semibold leading-snug line-clamp-2">{{ $p->title_tr }}</span>

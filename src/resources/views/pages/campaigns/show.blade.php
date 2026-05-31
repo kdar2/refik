@@ -35,7 +35,7 @@
 {{-- Hero --}}
 <section class="relative overflow-hidden min-h-[460px] lg:min-h-[560px] flex">
     <div class="absolute inset-0">
-        <img src="{{ $campaign->cover_image }}" alt="{{ $campaign->title_tr }}"
+        <img src="{{ $campaign->cover_image ?: asset(config('site.default_image')) }}" alt="{{ $campaign->title_tr }}"
              class="w-full h-full object-cover object-center" fetchpriority="high">
         <div class="absolute inset-0 bg-gradient-to-t from-brand-900/95 via-brand-900/55 to-brand-900/15"></div>
     </div>
@@ -107,7 +107,7 @@
                         @foreach ($similar as $s)
                             <a href="{{ route('campaigns.show', $s->slug) }}" class="card group block">
                                 <div class="card-media">
-                                    <img src="{{ $s->cover_image }}" alt="{{ $s->title_tr }}"
+                                    <img src="{{ $s->cover_image ?: asset(config('site.default_image')) }}" alt="{{ $s->title_tr }}"
                                          class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
                                 </div>
                                 <div class="card-body">
