@@ -6,9 +6,9 @@
     <meta name="theme-color" content="#0B295C">
 
     {{-- Favicon --}}
-    <link rel="icon" type="image/png" href="{{ asset(config('site.logo')) }}">
-    <link rel="apple-touch-icon" href="{{ asset(config('site.logo')) }}">
-    <link rel="shortcut icon" href="{{ asset(config('site.logo')) }}">
+    <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}">
+    <link rel="shortcut icon" href="{{ asset('favicon.ico') }}">
+    <link rel="apple-touch-icon" href="{{ asset('favicon.ico') }}">
 
     <title>@yield('title', config('app.name', 'Refik Derneği')) — Refik Derneği</title>
     <meta name="description" content="@yield('description', 'Refik Derneği — Hayra Yoldaş. Bağışlarınızla dünyada ihtiyaç sahiplerine umut oluyoruz.')">
