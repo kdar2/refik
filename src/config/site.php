@@ -12,7 +12,7 @@ return [
     'name'          => 'Refik Derneği',
     'legal_name'    => 'Refik Eğitim, Kültür ve Yardımlaşma Derneği',
     'tagline'       => 'Hayra Yoldaş',
-    'logo'          => '/storage/refiklogo2.png',
+    'logo'          => '/storage/refik_full_logo.png',
 
     'contact' => [
         'phone'   => '+90 501 567 33 33',
