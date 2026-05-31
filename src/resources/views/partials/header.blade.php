@@ -6,7 +6,7 @@
     <div class="container-x flex items-center gap-6 py-4">
 
         {{-- Logo --}}
-        <a href="{{ route('home') }}" class="flex items-center gap-2 shrink-0 group" aria-label="{{ config('site.legal_name') }}">
+        <a href="{{ route('home') }}" class="flex items-center shrink-0 group" aria-label="{{ config('site.legal_name') }}">
             <img src="{{ asset(config('site.logo')) }}" alt="{{ config('site.name') }}"
                  class="h-10 w-auto object-contain group-hover:scale-105 transition">
         </a>

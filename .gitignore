@@ -23,7 +23,6 @@ src/node_modules/
 src/vendor/
 src/public/build/
 src/public/hot/
-src/public/storage/
 src/_ide_helper.php
 src/.phpunit.result.cache
 src/.phpunit.cache/

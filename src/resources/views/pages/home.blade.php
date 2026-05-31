@@ -5,16 +5,32 @@
 @section('content')
 
 {{-- ────────────────  B1 — HERO SLIDER  ──────────────── --}}
-@php($slidesCount = $sliders->count() ?: 1)
-<section class="relative isolate overflow-hidden bg-gradient-to-br from-brand-700 via-brand-800 to-brand-900 text-white">
-    <div class="absolute inset-0 bg-grid-soft opacity-40 pointer-events-none"></div>
-
-    <div x-data="heroSlider({{ $slidesCount }}, 7000)"
+@php
+    $slidesCount = $sliders->count() ?: 1;
+    // Backend'den image gelmediğinde fallback olarak local görseller (sıraya göre döner)
+    $heroFallbacks = [
+        '/storage/refik_image_1.png',
+        '/storage/kurban-1.png',
+        '/storage/filisitine-yardim.png',
+        '/storage/refik-kumanya-bagis-kapak.jpg',
+        '/storage/ic-sayfa-detay-1.jpg',
+    ];
+@endphp
+<section x-data="heroSlider({{ $slidesCount }}, 7000)"
          x-init="start()"
          @mouseenter="paused = true" @mouseleave="paused = false"
-         class="container-x relative pt-16 pb-24 lg:pt-20 lg:pb-28">
+         class="relative isolate overflow-hidden bg-gradient-to-br from-brand-700 via-brand-800 to-brand-900 text-white">
 
-        {{-- Slaytlar: CSS grid stack — hepsi aynı hücrede üst üste; yükseklik en uzun slayt'a göre otomatik --}}
+    {{-- Dekoratif zemin: navy gradient + nokta dokusu + sağ üstte yumuşak ışık halesi --}}
+    <div class="absolute inset-0 bg-grid-soft opacity-25 pointer-events-none"></div>
+    <div class="absolute -top-32 -right-32 w-[520px] h-[520px] rounded-full bg-brand-500/20 blur-3xl pointer-events-none"></div>
+    <div class="absolute -bottom-40 -left-40 w-[480px] h-[480px] rounded-full bg-accent-500/10 blur-3xl pointer-events-none"></div>
+
+    <div class="container-x relative pt-16 pb-20 lg:pt-20 lg:pb-24">
+
+        <div class="grid lg:grid-cols-[1.05fr_1fr] items-center gap-10 lg:gap-14">
+
+        {{-- ─── Sol: Metin slaytları (CSS grid stack) ─── --}}
         <div class="grid">
             @forelse ($sliders as $i => $slide)
                 <div :class="active === {{ $i }}
@@ -26,7 +42,7 @@
                         @if ($slide->eyebrow_tr)
                             <p class="h-eyebrow text-brand-200">{{ $slide->eyebrow_tr }}</p>
                         @endif
-                        <h1 class="mt-3 text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold font-display leading-[1.05] tracking-tight text-balance">
+                        <h1 class="mt-3 text-4xl sm:text-5xl md:text-6xl lg:text-6xl xl:text-7xl font-extrabold font-display leading-[1.05] tracking-tight text-balance">
                             {{ $slide->title_tr }}
                         </h1>
                         @if ($slide->subtitle_tr)
@@ -62,7 +78,7 @@
                 <div class="row-start-1 col-start-1" data-rise>
                     <div class="lg:max-w-2xl">
                         <p class="h-eyebrow text-brand-200">Hayra Yoldaş</p>
-                        <h1 class="mt-3 text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold font-display leading-[1.05] tracking-tight text-balance">
+                        <h1 class="mt-3 text-4xl sm:text-5xl md:text-6xl lg:text-6xl xl:text-7xl font-extrabold font-display leading-[1.05] tracking-tight text-balance">
                             Sadakan Sonsuz Olsun
                         </h1>
                         <p class="mt-6 text-base lg:text-lg text-brand-100/90 max-w-xl">
@@ -72,6 +88,48 @@
                 </div>
             @endforelse
         </div>
+        {{-- /Sol --}}
+
+        {{-- ─── Sağ: Görsel — organik blob şekli, kenarları arka plana eriyor ─── --}}
+        <div class="hidden lg:block relative">
+            {{-- Geniş, yumuşak ışık halesi — blob şeklinde, arka planla bütünleşir --}}
+            <div class="absolute -inset-10 bg-gradient-to-br from-gold-500/20 via-brand-400/10 to-accent-500/15 blur-3xl pointer-events-none"
+                 style="border-radius: 47% 53% 42% 58% / 55% 60% 40% 45%;"></div>
+
+            {{-- Dekoratif ince eğri (referans tasarımdaki S-curve gibi) --}}
+            <svg class="absolute inset-0 w-full h-full pointer-events-none opacity-60"
+                 style="transform: scale(1.08) translate(0.5rem, -0.5rem);"
+                 viewBox="0 0 100 120" fill="none" preserveAspectRatio="none" aria-hidden="true">
+                <path d="M50,6 C82,10 96,40 88,82 C80,118 30,120 10,88 C-8,52 14,8 50,6 Z"
+                      stroke="rgba(255,255,255,0.25)" stroke-width="0.4" fill="none"/>
+            </svg>
+            <svg class="absolute inset-0 w-full h-full pointer-events-none opacity-40"
+                 style="transform: scale(1.14) translate(-0.4rem, 0.3rem);"
+                 viewBox="0 0 100 120" fill="none" preserveAspectRatio="none" aria-hidden="true">
+                <path d="M55,4 C88,12 100,46 90,86 C80,122 22,118 6,84 C-10,46 18,2 55,4 Z"
+                      stroke="rgba(192,151,64,0.35)" stroke-width="0.3" fill="none"/>
+            </svg>
+
+            {{-- Görsel: organik blob border-radius + edges arka plana eriyen yumuşak vignette --}}
+            <div class="relative aspect-[5/6] overflow-hidden bg-brand-800"
+                 style="border-radius: 47% 53% 42% 58% / 55% 60% 40% 45%;">
+                @foreach ($sliders as $i => $slide)
+                    @php($slideImage = $slide->image ?: $heroFallbacks[$i % count($heroFallbacks)])
+                    <img :class="active === {{ $i }} ? 'opacity-100 scale-100' : 'opacity-0 scale-105'"
+                         src="{{ $slideImage }}"
+                         alt="{{ $slide->title_tr ?? '' }}"
+                         loading="{{ $i === 0 ? 'eager' : 'lazy' }}"
+                         fetchpriority="{{ $i === 0 ? 'high' : 'low' }}"
+                         class="absolute inset-0 w-full h-full object-cover transition-all duration-[900ms] ease-out">
+                @endforeach
+                {{-- Çok hafif vignette: merkez tamamen net, sadece kenarlarda hafif feather --}}
+                <div class="absolute inset-0 pointer-events-none"
+                     style="background: radial-gradient(ellipse 85% 80% at 50% 50%, transparent 70%, rgba(3,19,44,0.35) 100%);"></div>
+            </div>
+        </div>
+        {{-- /Sağ --}}
+
+        </div>{{-- /lg:grid-cols --}}
 
         {{-- Sağ alt navigasyon --}}
         @if ($sliders->count() > 1)
