@@ -8,14 +8,7 @@
                 icon="heart-handshake"
                 class="w-full sm:max-w-xs sm:flex-1"
                 :selected="''"
-                :options="[
-                    ''                          => 'Genel Bağış',
-                    'gazze-acil-sicak-yemek'    => 'Gazze Acil — Sıcak Yemek',
-                    'ramazan-gida-paketi'       => 'Ramazan Gıda Paketi',
-                    'yetim-sponsorlugu'         => 'Yetim Sponsorluğu',
-                    'su-kuyusu-ac'              => 'Su Kuyusu Aç',
-                    'ilim-yolcusuna-destek'     => 'İlim Yolcusuna Destek',
-                ]"
+                :options="$quickDonateProjects ?? ['' => 'Genel Bağış']"
             />
 
             <x-select-pretty

@@ -3,6 +3,7 @@
 namespace App\View\Composers;
 
 use App\Models\Donation;
+use App\Services\ApiService;
 use App\Services\Cart\DonationCart;
 use App\Services\HijriDateService;
 use App\Services\PrayerTimeService;
@@ -15,6 +16,7 @@ class TopbarComposer
         private readonly HijriDateService $hijri,
         private readonly PrayerTimeService $prayer,
         private readonly DonationCart $cart,
+        private readonly ApiService $api,
     ) {
     }
 
@@ -23,12 +25,25 @@ class TopbarComposer
         $currency = config('currencies.active', config('currencies.default', 'TRY'));
 
         $view->with([
-            'topbarHijri'         => $this->hijri->formatted(),
-            'topbarNextPrayer'    => $this->prayer->next(),
-            'topbarLastDonation'  => $this->lastDonation(),
-            'topbarCartCount'     => $this->cart->count(),
-            'topbarCartTotal'     => $this->cart->totalFormatted($currency),
+            'topbarHijri'            => $this->hijri->formatted(),
+            'topbarNextPrayer'       => $this->prayer->next(),
+            'topbarLastDonation'     => $this->lastDonation(),
+            'topbarCartCount'        => $this->cart->count(),
+            'topbarCartTotal'        => $this->cart->totalFormatted($currency),
+            'quickDonateProjects'    => $this->quickDonateProjects(),
         ]);
+    }
+
+    private function quickDonateProjects(): array
+    {
+        return Cache::remember('topbar:quick-donate-projects', 300, function () {
+            $projects = $this->api->collect('/api/v1/donations/projects/', ['status' => 'active', 'page_size' => 20], 300);
+            $options = ['' => 'Genel Bağış'];
+            foreach ($projects as $p) {
+                $options[$p->slug] = $p->title;
+            }
+            return $options;
+        });
     }
 
     /**
