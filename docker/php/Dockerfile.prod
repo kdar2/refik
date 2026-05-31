@@ -1,0 +1,51 @@
+# Multi-stage Refik production image:
+#   stage 1: composer + node ile vendor + build
+#   stage 2: ince PHP-FPM image, sadece ihtiyaç olan dosyalar
+
+# ─── Stage 1: builder ───
+FROM php:8.3-cli AS builder
+
+RUN apt-get update && apt-get install -y \
+        git curl ca-certificates gnupg unzip libzip-dev libpng-dev libonig-dev libxml2-dev \
+    && mkdir -p /etc/apt/keyrings \
+    && curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | gpg --dearmor -o /etc/apt/keyrings/nodesource.gpg \
+    && echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_22.x nodistro main" > /etc/apt/sources.list.d/nodesource.list \
+    && apt-get update \
+    && apt-get install -y nodejs \
+    && docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd zip \
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
+
+COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+
+WORKDIR /build
+COPY src/ /build/
+
+RUN composer install --no-dev --optimize-autoloader --no-interaction --no-progress \
+    && npm ci --no-audit --no-fund --loglevel=error \
+    && npm run build \
+    && rm -rf node_modules
+
+# ─── Stage 2: runtime ───
+FROM php:8.3-fpm
+
+RUN apt-get update && apt-get install -y \
+        libpng-dev libonig-dev libxml2-dev libzip-dev \
+    && docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd zip opcache \
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
+
+# Production opcache + PHP ayarları
+COPY docker/php/php.ini /usr/local/etc/php/conf.d/zz-refik.ini
+
+RUN groupadd -g 1000 www && useradd -u 1000 -ms /bin/bash -g www www
+
+WORKDIR /var/www
+COPY --from=builder --chown=www:www /build/ /var/www/
+
+# Storage izinleri
+RUN mkdir -p storage/framework/{cache,sessions,views} bootstrap/cache \
+    && chown -R www:www storage bootstrap/cache \
+    && chmod -R 775 storage bootstrap/cache
+
+USER www
+
+CMD ["php-fpm"]

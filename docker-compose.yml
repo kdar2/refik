@@ -1,0 +1,65 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: docker/php/Dockerfile
+    container_name: refik-app
+    working_dir: /var/www
+    volumes:
+      - ./src:/var/www
+    networks:
+      - refik
+    depends_on:
+      - mysql
+
+  nginx:
+    image: nginx:alpine
+    container_name: refik-nginx
+    restart: unless-stopped
+    ports:
+      - "8090:80"
+    volumes:
+      - ./src:/var/www
+      - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf
+    networks:
+      - refik
+    depends_on:
+      - app
+
+  mysql:
+    image: mysql:8.0
+    container_name: refik-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: refik
+      MYSQL_USER: refik
+      MYSQL_PASSWORD: secret
+      MYSQL_ROOT_PASSWORD: rootsecret
+    ports:
+      - "3306:3306"
+    volumes:
+      - refik-mysql-data:/var/lib/mysql
+    networks:
+      - refik
+
+  phpmyadmin:
+    image: phpmyadmin:latest
+    container_name: refik-phpmyadmin
+    restart: unless-stopped
+    ports:
+      - "8081:80"
+    environment:
+      PMA_HOST: mysql
+      PMA_USER: root
+      PMA_PASSWORD: rootsecret
+    networks:
+      - refik
+    depends_on:
+      - mysql
+
+networks:
+  refik:
+    driver: bridge
+
+volumes:
+  refik-mysql-data:

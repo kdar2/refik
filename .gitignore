@@ -1,0 +1,39 @@
+# OS / editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+.cursor/
+.codex/
+.zed/
+.fleet/
+*.swp
+*.swo
+
+# Logs
+*.log
+
+# Laravel uygulaması (src/) — env ve build artifact'larını ek güvence olarak yine de yok say.
+# (src/.gitignore zaten kapsıyor; bu blok kazara üst seviyede bir .env oluşması ihtimaline karşı.)
+src/.env
+src/.env.backup
+src/.env.production
+src/auth.json
+src/node_modules/
+src/vendor/
+src/public/build/
+src/public/hot/
+src/public/storage/
+src/_ide_helper.php
+src/.phpunit.result.cache
+src/.phpunit.cache/
+src/storage/framework/cache/data/
+src/storage/framework/sessions/
+src/storage/framework/views/
+src/storage/framework/testing/
+src/storage/logs/
+src/storage/pail/
+src/storage/*.key
+
+# Claude / yerel ajan
+.claude/

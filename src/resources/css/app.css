@@ -1,0 +1,203 @@
+@import 'tailwindcss';
+
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../../storage/framework/views/*.php';
+@source '../**/*.blade.php';
+@source '../**/*.js';
+
+/* ────────────────────────────────────────────────────────────────────────────
+ *  REFİK — Tasarım Sistemi (Tailwind v4 @theme)
+ *  Detay: docs/DESIGN.md
+ * ──────────────────────────────────────────────────────────────────────────── */
+@theme {
+  /* Marka — Royal Indigo Navy (rafine, hafif daha indigo ve derin) */
+  --color-brand-50:  #EFF2FA;
+  --color-brand-100: #D5DDEF;
+  --color-brand-200: #ADBDDB;
+  --color-brand-300: #7A8EC3;
+  --color-brand-400: #4D67A7;
+  --color-brand-500: #2B448C;
+  --color-brand-600: #143479;
+  --color-brand-700: #0B295C;
+  --color-brand-800: #061E45;
+  --color-brand-900: #03132C;
+
+  /* Vurgu (bağış) — Wine Crimson (daha az neon, şarap tonlu) */
+  --color-accent-50:  #FFF1F3;
+  --color-accent-100: #FEE0E6;
+  --color-accent-300: #F66D87;
+  --color-accent-500: #D52B52;
+  --color-accent-600: #AF1F45;
+  --color-accent-700: #8B1736;
+
+  /* Altın — Champagne (daha sıcak, lüks) */
+  --color-gold-50:  #FBF7E8;
+  --color-gold-100: #F4ECD0;
+  --color-gold-300: #DCBE7A;
+  --color-gold-500: #C09740;
+  --color-gold-600: #9D7B33;
+  --color-gold-700: #7C6028;
+
+  /* Yüzeyler */
+  --color-surface:     #FFFFFF;
+  --color-surface-alt: #F6F8FC;
+  --color-surface-dark:#03132C;
+  --color-border:      #E2E7F0;
+
+  /* Metin (ink) — koyu zemin/açık zemin esnekliği için */
+  --color-ink:        #0F172A;   /* ana metin (slate-900) */
+  --color-ink-muted:  #64748B;   /* ikincil (slate-500) */
+  --color-ink-soft:   #94A3B8;   /* yardımcı (slate-400) */
+
+  /* Semantic — DESIGN.md §2.5 */
+  --color-success-50:  #ECFDF5;
+  --color-success-500: #16A34A;
+  --color-success-700: #15803D;
+  --color-warning-50:  #FEF3C7;
+  --color-warning-500: #F59E0B;
+  --color-warning-700: #B45309;
+  --color-danger-50:   #FEF2F2;
+  --color-danger-500:  #DC2626;
+  --color-danger-700:  #B91C1C;
+  --color-info-50:     #F0F9FF;
+  --color-info-500:    #0EA5E9;
+  --color-info-700:    #0369A1;
+
+  /* Tipografi */
+  --font-display: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
+  --font-sans:    'Inter', ui-sans-serif, system-ui, sans-serif;
+  --font-serif:   'Cormorant Garamond', ui-serif, Georgia, serif;
+
+  /* Gölgeler — yeni paletin RGB karşılıkları */
+  --shadow-soft:  0 4px 18px -6px rgba(15, 23, 42, 0.10);
+  --shadow-brand: 0 12px 40px -8px rgba(11, 41, 92, 0.28);
+  --shadow-accent:0 12px 40px -8px rgba(213, 43, 82, 0.30);
+  --shadow-gold:  0 12px 40px -8px rgba(192, 151, 64, 0.35);
+
+  /* Radius */
+  --radius-card: 1.25rem;
+}
+
+/* ────────────────────────────────────────────────────────────────────────────
+ *  Component sınıfları
+ * ──────────────────────────────────────────────────────────────────────────── */
+@layer components {
+  /* ── Buton: tüm variantlar tek seviyede @apply (Tailwind v4 component-to-component referans desteklemez) */
+  .btn,
+  .btn-primary,
+  .btn-accent,
+  .btn-gold,
+  .btn-outline,
+  .btn-ghost {
+    @apply inline-flex items-center justify-center gap-2 font-semibold rounded-lg transition-all duration-200
+           focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2
+           disabled:opacity-50 disabled:cursor-not-allowed
+           px-5 py-2.5 text-base;
+  }
+  .btn-primary { @apply bg-brand-700 text-white hover:bg-brand-900 hover:-translate-y-px focus-visible:outline-brand-500; }
+  .btn-accent  { @apply bg-accent-500 text-white hover:bg-accent-600 hover:-translate-y-px focus-visible:outline-accent-500; }
+  .btn-gold    { @apply bg-gold-500 text-brand-900 hover:bg-gold-600 hover:-translate-y-px focus-visible:outline-gold-500; }
+  .btn-outline { @apply border-2 border-brand-700 text-brand-700 bg-white hover:bg-brand-50; }
+  .btn-ghost   { @apply text-brand-700 hover:bg-brand-50; }
+
+  /* Boyut override sınıfları — variant'lardan SONRA tanımlandığı için kazanır */
+  .btn-sm { @apply px-3 py-1.5 text-sm; }
+  .btn-md { @apply px-5 py-2.5 text-base; }
+  .btn-lg { @apply px-7 py-3.5 text-lg; }
+
+  .card { @apply bg-white rounded-2xl shadow-md hover:shadow-lg transition border border-slate-100 overflow-hidden; }
+  .card-media { @apply relative aspect-video bg-slate-100 overflow-hidden; }
+  .card-body  { @apply p-5 lg:p-6; }
+  .card-title { @apply text-lg lg:text-xl font-bold text-brand-900 font-display; }
+  .card-text  { @apply mt-2 text-sm text-slate-600; }
+
+  .section     { @apply py-12 lg:py-20; }
+  .section-sm  { @apply py-8 lg:py-12; }
+  .container-x { @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8; }
+
+  .h-eyebrow  { @apply text-xs uppercase tracking-[0.18em] font-semibold text-brand-500; }
+  .h-section  { @apply text-3xl lg:text-4xl font-extrabold text-brand-900 font-display tracking-tight; }
+  .h-card     { @apply text-lg lg:text-xl font-bold text-brand-900 font-display; }
+
+  /* Badge: ortak tabanı tüm variantlara aynı anda uygula */
+  .badge,
+  .badge-z,
+  .badge-sc,
+  .badge-f,
+  .badge-emergency {
+    @apply inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-semibold;
+  }
+  .badge-z         { @apply bg-gold-100 text-gold-700; }
+  .badge-sc        { @apply bg-emerald-100 text-emerald-700; }
+  .badge-f         { @apply bg-sky-100 text-sky-700; }
+  .badge-emergency { @apply bg-amber-300 text-slate-900; }
+
+  .input {
+    @apply w-full px-4 py-3 rounded-lg border border-slate-200 bg-white
+           focus:border-brand-500 focus:ring-2 focus:ring-brand-200 focus:outline-none
+           placeholder:text-slate-400;
+  }
+  .label { @apply block text-sm font-medium text-slate-700 mb-1.5; }
+  .help  { @apply mt-1.5 text-xs text-slate-500; }
+  .error { @apply mt-1.5 text-xs text-red-600; }
+
+  .progress { @apply relative h-2 w-full bg-slate-200 rounded-full overflow-hidden; }
+  .progress > .bar { @apply absolute inset-y-0 left-0 bg-emerald-500 rounded-full transition-all duration-700 ease-out; }
+
+  .sticky-bottom-bar {
+    @apply fixed bottom-0 inset-x-0 z-40 bg-white/95 backdrop-blur border-t border-slate-200;
+    box-shadow: 0 -8px 24px -12px rgba(15, 23, 42, 0.15);
+  }
+}
+
+/* ────────────────────────────────────────────────────────────────────────────
+ *  Utilities
+ * ──────────────────────────────────────────────────────────────────────────── */
+@layer utilities {
+  .bg-grid-soft {
+    background-image: radial-gradient(circle, rgba(11,41,92,.08) 1px, transparent 1px);
+    background-size: 24px 24px;
+  }
+  .text-balance { text-wrap: balance; }
+  .scrollbar-none::-webkit-scrollbar { display: none; }
+  .scrollbar-none { scrollbar-width: none; }
+
+  .animate-rise    { animation: rise .7s cubic-bezier(.22,1,.36,1) both; }
+  .animate-fade-in { animation: fade-in .5s ease-out both; }
+
+  @keyframes rise    { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation: none !important; transition: none !important; }
+  }
+}
+
+/* ────────────────────────────────────────────────────────────────────────────
+ *  Global tipografi
+ * ────────────────────────────────────────────────────────────────────────────
+ *  Renk: parent inheritance ile geliyor — koyu/parlak kart context'lerinde
+ *  text-white / text-brand-900 vb. parent'ta verildiğinde h1-h5 otomatik
+ *  uyum sağlar. Ayrı renk kuralı set etmiyoruz (eski kural kart metinlerini
+ *  bozuyordu).
+ * ──────────────────────────────────────────────────────────────────────────── */
+html { scroll-behavior: smooth; }
+body {
+  font-family: var(--font-sans);
+  color: var(--color-ink);
+  background: #fff;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+:where(h1, h2, h3, h4, h5, h6) {
+  font-family: var(--font-display);
+  letter-spacing: -0.01em;
+}
+
+.skip-link {
+  @apply absolute left-2 top-2 z-[100] -translate-y-20 focus:translate-y-0 transition rounded-lg bg-brand-700 text-white px-4 py-2 text-sm font-semibold;
+}
+
+/* Seçim (selection) markası */
+::selection { background-color: var(--color-brand-700); color: #fff; }
