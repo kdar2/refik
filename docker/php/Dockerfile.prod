@@ -40,12 +40,19 @@ RUN groupadd -g 1000 www && useradd -u 1000 -ms /bin/bash -g www www
 
 WORKDIR /var/www
 COPY --from=builder --chown=www:www /build/ /var/www/
+# public/ içeriğini public-src/ olarak yedekle (entrypoint volume'a kopyalar)
+RUN cp -a /var/www/public /var/www/public-src
 
 # Storage izinleri
 RUN mkdir -p storage/framework/{cache,sessions,views} bootstrap/cache \
     && chown -R www:www storage bootstrap/cache \
     && chmod -R 775 storage bootstrap/cache
 
+# public/ içeriğini volume'a kopyalayan entrypoint
+COPY docker/php/entrypoint.sh /usr/local/bin/entrypoint.sh
+RUN chmod +x /usr/local/bin/entrypoint.sh
+
 USER www
 
+ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
 CMD ["php-fpm"]
