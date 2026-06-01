@@ -26,28 +26,16 @@
                 name="amount"
                 icon="banknote"
                 class="w-full sm:max-w-[140px]"
-                :selected="'100'"
-                :options="[
-                    '50'   => '50 TL',
-                    '100'  => '100 TL',
-                    '250'  => '250 TL',
-                    '500'  => '500 TL',
-                    '1000' => '1.000 TL',
-                ]"
+                :selected="array_key_first($quickDonateAmounts ?? ['100' => '100 TL'])"
+                :options="$quickDonateAmounts ?? ['50' => '50 TL', '100' => '100 TL', '250' => '250 TL', '500' => '500 TL', '1000' => '1.000 TL']"
             />
 
             <x-select-pretty
                 name="type"
                 icon="bookmark"
                 class="w-full sm:max-w-[140px]"
-                :selected="'zakat'"
-                :options="[
-                    'zakat'  => 'Zekat',
-                    'fitre'  => 'Fitre',
-                    'kurban' => 'Kurban',
-                    'sadaka' => 'Sadaka',
-                    'genel'  => 'Genel',
-                ]"
+                :selected="array_key_first($quickDonateTypes ?? ['zekat' => 'Zekat'])"
+                :options="$quickDonateTypes ?? ['zekat' => 'Zekat', 'fitre' => 'Fitre', 'sadaka' => 'Sadaka', 'genel' => 'Genel']"
             />
 
             <a href="{{ route('cart.show') }}"

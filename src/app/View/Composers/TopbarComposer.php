@@ -31,7 +31,39 @@ class TopbarComposer
             'topbarCartCount'        => $this->cart->count(),
             'topbarCartTotal'        => $this->cart->totalFormatted($currency),
             'quickDonateProjects'    => $this->quickDonateProjects(),
+            'quickDonateTypes'       => $this->quickDonateTypes(),
+            'quickDonateAmounts'     => $this->quickDonateAmounts(),
         ]);
+    }
+
+    private function quickDonateTypes(): array
+    {
+        return Cache::remember('topbar:quick-donate-types', 600, function () {
+            $types = $this->api->collect('/api/v1/donations/quick-donations/', [], 600);
+            $options = [];
+            foreach ($types as $t) {
+                $options[$t->slug] = $t->name;
+            }
+            return $options ?: ['genel' => 'Genel Bağış'];
+        });
+    }
+
+    private function quickDonateAmounts(): array
+    {
+        return Cache::remember('topbar:quick-donate-amounts', 600, function () {
+            $types = $this->api->collect('/api/v1/donations/quick-donations/', [], 600);
+            // İlk aktif türün suggested_amounts'ını kullan, yoksa default
+            $first = $types->first();
+            if ($first && !empty($first->suggested_amounts)) {
+                $amounts = [];
+                foreach (explode(',', $first->suggested_amounts) as $a) {
+                    $a = trim($a);
+                    $amounts[$a] = number_format((int)$a, 0, ',', '.') . ' TL';
+                }
+                return $amounts;
+            }
+            return ['50' => '50 TL', '100' => '100 TL', '250' => '250 TL', '500' => '500 TL', '1000' => '1.000 TL'];
+        });
     }
 
     private function quickDonateProjects(): array
