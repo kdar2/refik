@@ -39,6 +39,7 @@
         label: @json($selectedLabel),
         options: @json($normalized),
         focusIndex: -1,
+        init() { this.value = @json($selectedValue); this.label = @json($selectedLabel); },
         select(opt) { this.value = opt.value; this.label = opt.label; this.open = false; },
         toggle() { this.open = !this.open; if (this.open) this.focusIndex = this.options.findIndex(o => o.value === this.value); },
         move(delta) {
