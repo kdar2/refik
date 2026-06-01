@@ -4,11 +4,11 @@
         <div class="flex flex-wrap lg:flex-nowrap items-center gap-2">
 
             <x-select-pretty
-                name="campaign"
+                name="type"
                 icon="heart-handshake"
                 class="w-full sm:max-w-xs sm:flex-1"
-                :selected="''"
-                :options="$quickDonateProjects ?? ['' => 'Genel Bağış']"
+                :selected="array_key_first($quickDonateTypes ?? ['sadaka' => 'Sadaka'])"
+                :options="$quickDonateTypes ?? ['sadaka' => 'Sadaka', 'zekat' => 'Zekat', 'fitre' => 'Fitre']"
             />
 
             <x-select-pretty
@@ -30,13 +30,6 @@
                 :options="$quickDonateAmounts ?? ['50' => '50 TL', '100' => '100 TL', '250' => '250 TL', '500' => '500 TL', '1000' => '1.000 TL']"
             />
 
-            <x-select-pretty
-                name="type"
-                icon="bookmark"
-                class="w-full sm:max-w-[140px]"
-                :selected="array_key_first($quickDonateTypes ?? ['zekat' => 'Zekat'])"
-                :options="$quickDonateTypes ?? ['zekat' => 'Zekat', 'fitre' => 'Fitre', 'sadaka' => 'Sadaka', 'genel' => 'Genel']"
-            />
 
             <a href="{{ route('cart.show') }}"
                class="hidden md:flex items-center gap-2 px-3 py-2 rounded-lg bg-brand-50 text-brand-700 text-sm font-semibold ml-auto hover:bg-brand-100 transition">
